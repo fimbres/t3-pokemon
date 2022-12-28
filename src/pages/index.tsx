@@ -1,17 +1,18 @@
-import { getOptionsForVote } from '@/utils/getRandomPokemon';
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import { trpc } from '@/utils/trpc';
 import Image from 'next/image';
+
+import { getOptionsForVote } from '@/utils/getRandomPokemon';
+import { trpc } from '@/utils/trpc';
+import { GetPokemonByIdOutput } from './api/trpc/[trpc]';
+import Loading from '@/components/Loading';
 
 const Home: NextPage = () => {
   const [ids, setIds] = useState(getOptionsForVote());
   const firstPokemon = trpc.getPokemonById.useQuery({ id: ids.firstId! });
   const secondPokemon = trpc.getPokemonById.useQuery({ id: ids.secondId! });
   
-  if (firstPokemon.isLoading || secondPokemon.isLoading) return null;
-
   const voteForRoundest = (selected: number) => {
     setIds(getOptionsForVote(selected));
   };
@@ -24,22 +25,26 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className='bg-gray-800 flex flex-col w-full h-screen justify-center items-center'>
-        <div>
-          <div className='text-5xl text-center mb-16 text-white'>Which Pokémon is Rounder?</div>
-          <div className='border rounded-lg p-8 flex flex-col lg:flex-row justify-between items-center'>
-            <div className='h-60 bg-gray-700 rounded-md aspect-square flex flex-col justify-center items-center cursor-pointer' onClick={() => voteForRoundest(ids.firstId!)}>
-              <Image src={firstPokemon.data?.sprites.front_default!} width={150} height={150} alt="First Pokemon"/>
-              <div className='capitalize text-xl font-semibold text-white'>{firstPokemon.data?.name}</div>
-              <div className='text-regular font-light italic text-white'>Is rounder</div>
+        {firstPokemon.isLoading || secondPokemon.isLoading ? (
+          <Loading />
+        ) : (
+          <>
+            <div className='text-5xl text-center mb-16 text-white'>Which Pokémon is Rounder?</div>
+            <div className='border rounded-lg p-8 flex flex-col lg:flex-row justify-between items-center'>
+              <div className='h-60 bg-gray-700 rounded-md aspect-square flex flex-col justify-center items-center cursor-pointer' onClick={() => voteForRoundest(ids.firstId!)}>
+                <Image src={firstPokemon.data?.sprites.front_default!} width={150} height={150} alt="First Pokemon"/>
+                <div className='capitalize text-xl font-semibold text-white'>{firstPokemon.data?.name}</div>
+                <div className='text-regular font-light italic text-white'>Is rounder</div>
+              </div>
+              <div className='text-2xl my-6 mx-0 lg:mx-12 lg:my-0 font-semibold text-white'>VS</div>
+              <div className='h-60 bg-gray-700 rounded-md aspect-square flex flex-col justify-center items-center cursor-pointer' onClick={() => voteForRoundest(ids.secondId!)}>
+                <Image src={secondPokemon.data?.sprites.front_default!} width={150} height={150} alt="First Pokemon"/>
+                <div className='capitalize text-xl font-semibold text-white'>{secondPokemon.data?.name}</div>
+                <div className='text-regular font-light italic text-white'>Is rounder</div>
+              </div>
             </div>
-            <div className='text-2xl my-6 mx-0 lg:mx-12 lg:my-0 font-semibold text-white'>VS</div>
-            <div className='h-60 bg-gray-700 rounded-md aspect-square flex flex-col justify-center items-center cursor-pointer' onClick={() => voteForRoundest(ids.secondId!)}>
-              <Image src={secondPokemon.data?.sprites.front_default!} width={150} height={150} alt="First Pokemon"/>
-              <div className='capitalize text-xl font-semibold text-white'>{secondPokemon.data?.name}</div>
-              <div className='text-regular font-light italic text-white'>Is rounder</div>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </main>
     </>
   )
