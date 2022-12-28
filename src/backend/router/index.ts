@@ -13,6 +13,19 @@ export const appRouter = trpc.router({
         const pokemon = await api.getPokemonById(request.input.id);
 
         return { name: pokemon.name, sprites: pokemon.sprites};
+    }),
+    voteForPokemon: trpc.procedure.input(z.object({
+        votedFor: z.number(),
+        votedAgainst: z.number(),
+    }))
+    .mutation(async request => {
+        const voteInDb = await prisma?.vote.create({
+            data: {
+                ...request.input
+            }
+        });
+
+        return voteInDb;
     })
 });
 
