@@ -1,8 +1,10 @@
+import { PrismaClient } from '@prisma/client';
 import { initTRPC } from '@trpc/server';
 import { PokemonClient } from 'pokenode-ts';
 import { z } from "zod";
 
 const trpc = initTRPC.create();
+const prisma = new PrismaClient();
 
 export const appRouter = trpc.router({
     getPokemonById: trpc.procedure.input(z.object({
@@ -19,7 +21,7 @@ export const appRouter = trpc.router({
         votedAgainst: z.number(),
     }))
     .mutation(async request => {
-        const voteInDb = await prisma?.vote.create({
+        const voteInDb = await prisma.vote.create({
             data: {
                 ...request.input
             }
