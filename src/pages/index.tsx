@@ -12,8 +12,16 @@ const Home: NextPage = () => {
   const [ids, setIds] = useState(getOptionsForVote());
   const firstPokemon = trpc.getPokemonById.useQuery({ id: ids.firstId! });
   const secondPokemon = trpc.getPokemonById.useQuery({ id: ids.secondId! });
-  
+  const voteMutation = trpc.voteForPokemon.useMutation();
+
   const voteForRoundest = (selected: number) => {
+    if(selected === ids.firstId){
+      voteMutation.mutate({ votedFor: selected, votedAgainst: ids.secondId! });
+    }
+    else{
+      voteMutation.mutate({ votedFor: selected, votedAgainst: ids.firstId! });
+    }
+    
     setIds(getOptionsForVote(selected));
   };
 
