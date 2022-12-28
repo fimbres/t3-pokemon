@@ -3,8 +3,6 @@ import { initTRPC } from '@trpc/server';
 import { PokemonClient } from 'pokenode-ts';
 import { z } from "zod";
 
-import loadingImage from '../../assets/images/spinner.png';
-
 const trpc = initTRPC.create();
 const prisma = new PrismaClient();
 
@@ -21,6 +19,18 @@ export const appRouter = trpc.router({
         catch(e){
             console.error("Error: ", e);
             return { name: 'Unexpected error', sprites: null };
+        }
+    }),
+    getAllPokemons: trpc.procedure.query(async () => {
+        try {
+            const api = new PokemonClient();
+            const allPokemons = await api.listPokemons();
+
+            return allPokemons.results;
+        }
+        catch(e){
+            console.error("Error: ", e);
+            return [];
         }
     }),
     voteForPokemon: trpc.procedure.input(z.object({

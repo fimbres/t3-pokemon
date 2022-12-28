@@ -9,3 +9,4 @@ export default trpcNext.createNextApiHandler({
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 export type GetPokemonByIdOutput = RouterOutput['getPokemonById'];
+export type GetAllPokemonsOutput = RouterOutput['getAllPokemons'];
