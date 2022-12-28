@@ -1,13 +1,15 @@
-import { trpc } from '@/utils/trpc';
+import { getOptionsForVote } from '@/utils/getRandomPokemon';
+import { useEffect, useState } from 'react';
 import type { NextPage } from 'next'
 import Head from 'next/head'
 
 const Home: NextPage = () => {
-  const { data, isLoading } = trpc.hello.useQuery({ text: 'client' });
+  const [data, setData] = useState({ firstId: 0, secondId: 0});
 
-  if(isLoading) return (<div>Loading...</div>);
-
-  if(data) return (<div>{data.greeting}</div>);
+  useEffect(() => {
+    const data = getOptionsForVote();
+    setData({ firstId: data.firstId!, secondId: data.secondId! });
+  }, []);
 
   return (
     <>
@@ -20,9 +22,9 @@ const Home: NextPage = () => {
         <div className='max-w-lg'>
           <div className='text-2xl text-center mb-16'>Which Pokémon is Rounder?</div>
           <div className='border rounded-lg p-8 flex justify-between items-center'>
-            <div className='w-16 h-16 bg-red-200'/>
+            <div className='w-16 h-16 bg-red-200'>{data.firstId}</div>
             <div className='text-2xl'>Vs</div>
-            <div className='w-16 h-16 bg-red-200'/>
+            <div className='w-16 h-16 bg-red-200'>{data.secondId}</div>
           </div>
         </div>
       </main>
